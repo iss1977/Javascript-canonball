@@ -1,4 +1,35 @@
-window.onload = function(){
+//var scriptSpriteJs ; // here we gonna store a sprite  
+var assetsLoaded = 0;
+
+window.onload= readyAndLoaded;
+
+
+// this will run only after the javascript is completly loaded.
+    function readyAndLoaded (){
+    var mysprite = new mySprite(); // must declare here, because the code will be loaded async and will be avaible for sure here( window .load )
+
+    function loadsprite(){
+        return  new Promise(async (resolve, reject)=>{
+            var a =  mysprite.loadImage("./../images/2d-animation-explosion.png");   
+            console.log("End loading..."); 
+            resolve("ok");
+            
+        
+    })};
+
+    console.log("Main function running....");
+
+    // async function init(){
+    //     await loadsprite();
+    // }
+    // init();
+
+    (async ()=>{ await loadsprite();})();
+
+    console.log("Sprite:"+mysprite.spriteImage.src);
+
+
+
     var canvas = document.getElementById("canvas"),
     ptag= document.getElementById("angle-test"),
     ctx = canvas.getContext("2d"),
@@ -10,13 +41,20 @@ window.onload = function(){
         angle : Math.PI / 4
     }
 
+    ctx.clearRect(0,0,width,height);
+    ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+
+    
+
     // Attaching the event listener function to window's resize event
     window.addEventListener("resize", displayWindowSize);
     function displayWindowSize(){
         height = canvas.height = window.innerHeight;
         width  = canvas.width = window.innerWidth;
-        draw();
+        ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+        //draw();
     }
+    return;
 
     draw();
 
@@ -50,6 +88,9 @@ window.onload = function(){
 
     function draw(){
         ctx.clearRect(0,0,width,height);
+
+        ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+
         ctx.beginPath();
         // ctx.arc(100,100,100,0,180*Math.PI/180,true);
         ctx.arc(gun.x, gun.y, 24,0,180*Math.PI/180,true);
@@ -59,7 +100,7 @@ window.onload = function(){
         ctx.rotate (gun.angle);
         ctx.fillRect(27,-8,30,16);
         ctx.restore();
-        ptag.innerHTML = gun.angle.toString();
+        ptag.innerHTML = gun.angle.toString() +"-"+ assetsLoaded.toString();
 
     }
 
