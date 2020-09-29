@@ -9,12 +9,13 @@ async function readyAndLoaded (){
     ctx = canvas.getContext("2d");
 
 
-    var mysprite = new mySprite(); // must declare here, because the code will be loaded async and will be avaible for sure here( window .load )
+    var myExplosion = new MyExplosion(); // must declare here, because the code will be loaded async and will be avaible for sure here( window .load )
     var mycharacter = new myCharacter();
+    var mySprite = new MySprite();
 
     function loadsprite(myObject, imageFile, rows, cols, size_x, size_y, context2D){
         return  new Promise(async (resolve, reject)=>{
-            myObject.loadImage(imageFile, resolve);   // mysprite object will call resolve when finished loading.
+            myObject.loadImage(imageFile, resolve);   // myExplosion object will call resolve when finished loading.
             myObject.setSpriteProps(rows,cols,size_x,size_y,context2D); // the sprite has 4 col and 6 rows. single image is 200x150. whole sprite sheet is 1207 x 605 pixel
             console.log("Loading images ..."+ imageFile); 
     })};
@@ -22,8 +23,10 @@ async function readyAndLoaded (){
     console.log("Main started ...");
 
     async function init(){
-        await loadsprite(mysprite, "./../images/explosion3.png" , 9,7,71,71,ctx);
+        await loadsprite(myExplosion, "./../images/explosion3.png" , 9,7,71,71,ctx);
         await loadsprite(mycharacter, "./../images/girl-sprite-2.png" , 9,6,114,114,ctx);
+        await loadsprite(mySprite, "./../images/MeleeSpriteSheet.png" , 24,17,256,256,ctx);
+        
         console.log("init() complete.");
     }
     await init();
@@ -47,7 +50,7 @@ async function readyAndLoaded (){
     }
 
     ctx.clearRect(0,0,width,height);
-    ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+    ctx.drawImage(myExplosion.spriteImage, 150,  138, 150, 138);
 
     
 
@@ -57,7 +60,7 @@ async function readyAndLoaded (){
         height = canvas.height = window.innerHeight;
         width  = canvas.width = window.innerWidth;
         //ctx= canvas.getContext("2d");
-        //ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+        //ctx.drawImage(myExplosion.spriteImage, 150,  138, 150, 138);
         //draw();
     }
     
@@ -68,7 +71,7 @@ async function readyAndLoaded (){
         switch (event.keyCode){
             case 32: //
                 // do somethig
-                mysprite.startAnimation();
+                myExplosion.startAnimation();
                 mainAnimationCycle();
                 break;
             default:
@@ -83,10 +86,12 @@ async function readyAndLoaded (){
 
     draw();
 
-    mysprite.setXY(200,200);
-    mysprite.startAnimation();
+    myExplosion.setXY(200,200);
+    myExplosion.startAnimation();
     mycharacter.setXY(500,500);
     mycharacter.dance();
+    mySprite.setPosition(200,300);
+    mySprite.explode();
 
     let nextFrameNeeded = false;
 
@@ -97,13 +102,15 @@ async function readyAndLoaded (){
 
         ctx.globalAlpha = 1;
 
-        mysprite.tick();
+        myExplosion.tick();
         mycharacter.tick();
-        nextFrameNeeded = mysprite.currentlyAnimating || mycharacter.currentlyAnimating; 
+        mySprite.tick();
+        nextFrameNeeded = myExplosion.currentlyAnimating || mycharacter.currentlyAnimating || mySprite.animationActiv; 
 
         ctx.globalAlpha = 1;
 
-        if (nextFrameNeeded)
+        //if (nextFrameNeeded)
+        
         requestAnimationFrame(mainAnimationCycle); // call this again for the next frame.
 
     }
@@ -115,8 +122,12 @@ async function readyAndLoaded (){
         document.addEventListener("mouseup", onMouseUp);
        // aimGun(event.clientX, event.clientY);
 
-        mysprite.startAnimation();
+        myExplosion.startAnimation();
         mycharacter.dance();
+
+        mySprite.setPosition(200,300);
+        mySprite.explode();
+        
 
         mainAnimationCycle();
         
@@ -144,7 +155,7 @@ async function readyAndLoaded (){
     function draw(){
         ctx.clearRect(0,0,width,height);
 
-        //ctx.drawImage(mysprite.spriteImage, 150,  138, 150, 138);
+        //ctx.drawImage(myExplosion.spriteImage, 150,  138, 150, 138);
 
         ctx.beginPath();
         // ctx.arc(100,100,100,0,180*Math.PI/180,true);
